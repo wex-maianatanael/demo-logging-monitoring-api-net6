@@ -19,7 +19,8 @@ namespace Demo.Application.ApplicationServices
             var bank = new Bank(){ Name = model.Name };
 
             var createdBank = await _bankDomainService.CreateAsync(bank);
-
+            
+            // todo: use automapper here
             return new BankViewModel { ID = createdBank.ID, Name = createdBank.Name };
         }
 
@@ -34,64 +35,31 @@ namespace Demo.Application.ApplicationServices
         {
             var banks = await _bankDomainService.GetAllAsync();
 
-            var response = new List<BankViewModel>();
-            var accounts = new List<AccountViewModel>();
+            // todo: use automapper here
+            var banksViewModel = new List<BankViewModel>();
             foreach (var bank in banks)
             {
-                var model = new BankViewModel()
+                var bankViewModel = new BankViewModel()
                 {
                     ID = bank.ID,
                     Name = bank.Name
                 };
 
-                foreach (var account in bank.Accounts)
-                {
-                    var accountViewModel = new AccountViewModel()
-                    {
-                        ID = account.ID,
-                        Number = account.Number,
-                        CreatedDate = account.CreatedDate,
-                        Active = account.Active,
-                        Balance = account.Balance,
-                        BankID = account.BankID,
-                        CustomerID = account.CustomerID                        
-                    };
-
-                    model.Accounts.Add(accountViewModel);
-                }
-
-                response.Add(model);
+                banksViewModel.Add(bankViewModel);
             }
 
-            return response;
+            return banksViewModel;
         }
 
         public async Task<BankViewModel> GetByIdAsync(Guid id)
         {
             var bank = await _bankDomainService.GetByIdAsync(id);
 
-            var accountsModel = new List<AccountViewModel>();
-            foreach (var account in bank.Accounts)
-            {
-                var accountModel = new AccountViewModel()
-                {
-                    ID = account.ID,
-                    CustomerID = account.CustomerID,
-                    BankID = account.BankID,
-                    CreatedDate = account.CreatedDate,
-                    Active = account.Active,
-                    Balance = account.Balance,
-                    Number = account.Number
-                };
-
-                accountsModel.Add(accountModel);
-            }
-
+            // todo: use automapper here
             return new BankViewModel()
             {
                 ID = bank.ID,
-                Name = bank.Name,
-                Accounts = accountsModel
+                Name = bank.Name
             };
         }
 

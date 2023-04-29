@@ -9,51 +9,69 @@ namespace Demo.Application.ApplicationServices
     public class CustomerApplicationService : ICustomerApplicationService
     {
         private readonly ICustomerDomainService _customerDomainService;
-        private readonly IAccountDomainService _accountDomainService;
 
-        public CustomerApplicationService(ICustomerDomainService customerDomainService, IAccountDomainService accountDomainService)
+        public CustomerApplicationService(ICustomerDomainService customerDomainService)
         {
             _customerDomainService = customerDomainService;
-            _accountDomainService = accountDomainService;
         }
 
         public async Task<CustomerViewModel> CreateAsync(CustomerViewModel model)
         {
-            var account = new Account() { 
-                Number = model.Account.Number,
-                CreatedDate = model.Account.CreatedDate,
-                Balance = model.Account.Balance,
-                Active = model.Account.Active 
-                //todo: add the reference to the bank
-            };
-
-            var createdAccount = await _accountDomainService.CreateAsync(account);
-
-            var customer = new Customer() { Name = model.Name, BirthDate = model.BirthDate, Account = createdAccount };
-
+            var customer = new Customer() { Name = model.Name, BirthDate = model.BirthDate };
             var createdCustomer = await _customerDomainService.CreateAsync(customer);
 
-            return new CustomerViewModel {  };
+            return new CustomerViewModel { ID = createdCustomer.ID, Name = createdCustomer.Name, BirthDate = createdCustomer.BirthDate };
         }
 
-        public Task<bool> DeleteAsync(Guid id)
+        public async Task<bool> DeleteAsync(Guid id)
         {
-            throw new NotImplementedException();
+            var customer = await _customerDomainService.GetByIdAsync(id);
+
+            return await _customerDomainService.DeleteAsync(customer);
         }
 
-        public Task<List<CustomerViewModel>> GetAllAsync()
+        public async Task<List<CustomerViewModel>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            var customers = await _customerDomainService.GetAllAsync();
+
+            // todo: use automapper here
+            var customersViewModel = new List<CustomerViewModel>();
+            foreach (var customer in customers)
+            {
+                var customerViewModel = new CustomerViewModel()
+                {
+                    ID = customer.ID,
+                    Name = customer.Name,
+                    BirthDate = customer.BirthDate
+                };
+
+                customersViewModel.Add(customerViewModel);
+            }
+
+            return customersViewModel;
         }
 
-        public Task<CustomerViewModel> GetByIdAsync(Guid id)
+        public async Task<CustomerViewModel> GetByIdAsync(Guid id)
         {
-            throw new NotImplementedException();
+            var customer = await _customerDomainService.GetByIdAsync(id);
+
+            // todo: use automapper here
+            return new CustomerViewModel()
+            {
+                ID = customer.ID,
+                Name = customer.Name,
+                BirthDate = customer.BirthDate
+            };
         }
 
-        public Task<bool> UpdateAsync(CustomerViewModel model)
+        public async Task<bool> UpdateAsync(CustomerViewModel model)
         {
-            throw new NotImplementedException();
+            var customer = await _customerDomainService.GetByIdAsync(model.ID);
+
+            customer.Name = model.Name;
+            customer.BirthDate = model.BirthDate;
+
+            return await _customerDomainService.UpdateAsync(customer);
         }
     }
 }
