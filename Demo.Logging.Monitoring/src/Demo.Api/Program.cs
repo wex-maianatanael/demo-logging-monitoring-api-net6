@@ -1,5 +1,4 @@
-using Demo.Infra.Repository.Context;
-using Microsoft.EntityFrameworkCore;
+using Demo.Api.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,9 +9,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// todo: create extension methods
-builder.Services.AddDbContext<BankDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.AddDatabaseConfig();
+builder.AddDependencyInjectionResolver();
 
 var app = builder.Build();
 

@@ -35,6 +35,11 @@ namespace Demo.Application.ApplicationServices
         {
             var banks = await _bankDomainService.GetAllAsync();
 
+            if (banks.Count == 0 || banks == null)
+            {
+                return null;
+            }
+
             // todo: use automapper here
             var banksViewModel = new List<BankViewModel>();
             foreach (var bank in banks)
