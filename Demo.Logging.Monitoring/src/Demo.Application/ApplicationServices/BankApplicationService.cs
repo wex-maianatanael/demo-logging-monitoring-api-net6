@@ -60,6 +60,11 @@ namespace Demo.Application.ApplicationServices
         {
             var bank = await _bankDomainService.GetByIdAsync(id);
 
+            if (bank == null)
+            {
+                return null;
+            }
+
             // todo: use automapper here
             return new BankViewModel()
             {
