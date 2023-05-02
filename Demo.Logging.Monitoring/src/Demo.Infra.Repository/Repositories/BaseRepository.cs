@@ -65,7 +65,7 @@ namespace Demo.Infra.Repository.Repositories
             }
             catch (Exception ex)
             {
-                var newEx = new ApplicationException("Something bad happened in database.", ex);
+                var newEx = new DbUpdateException("Something bad happened in database.", ex);
                 newEx.Data.Add(typeof(TEntity).Name, id);
                 throw newEx;
             }

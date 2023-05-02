@@ -1,4 +1,6 @@
-﻿namespace Demo.Api.CustomMiddlewares
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace Demo.Api.CustomMiddlewares
 {
     public class CriticalExceptionMiddleware
     {
@@ -17,7 +19,7 @@
             {
                 await _next(context);
             }
-            catch (ApplicationException ex)
+            catch (DbUpdateException ex)
             {
                 if(ex.Message.Contains("database"))
                 {

@@ -2,6 +2,7 @@ using Demo.Api.Configuration;
 using Demo.Api.CustomMiddlewares;
 using Demo.Infra.Repository.Context;
 using Hellang.Middleware.ProblemDetails;
+using Microsoft.EntityFrameworkCore;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Serilog;
@@ -44,7 +45,7 @@ builder.Services.AddProblemDetails(options =>
             details.Detail = "An error occurred in our API. Use the trace id when contacting us.";
         }
     };
-    options.Rethrow<ApplicationException>();
+    options.Rethrow<DbUpdateException>();
     options.MapToStatusCode<Exception>(StatusCodes.Status500InternalServerError);
 }); // using hellang lib
 
