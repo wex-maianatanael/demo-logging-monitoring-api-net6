@@ -21,7 +21,8 @@ namespace Demo.Api.Controllers
         [HttpPost("")]
         [ProducesResponseType(201)]
         [ProducesResponseType(400)]
-        public async Task<IActionResult> PostBankAsync(BankViewModel model)
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> PostAsync(BankViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -43,6 +44,7 @@ namespace Demo.Api.Controllers
         [HttpGet("")]
         [ProducesResponseType(200)]
         [ProducesResponseType(204)]
+        [ProducesResponseType(500)]
         public async Task<IActionResult> GetAllAsync()
         {
             // using scopes is a way to apply semantic logging.
@@ -68,6 +70,7 @@ namespace Demo.Api.Controllers
         [HttpGet("{id:guid}")]
         [ProducesResponseType(200)]
         [ProducesResponseType(204)]
+        [ProducesResponseType(500)]
         public async Task<IActionResult> GetByIdAsync(Guid id)
         {
             _logger.LogInformation("Getting Bank in API based on its ID {id}", id);
@@ -85,7 +88,8 @@ namespace Demo.Api.Controllers
         [HttpPut("")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
-        public async Task<IActionResult> PutBankAsync(BankViewModel model)
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> PutAsync(BankViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -106,7 +110,8 @@ namespace Demo.Api.Controllers
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        public async Task<IActionResult> DeleteBankAsync(Guid id)
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> DeleteAsync(Guid id)
         {
             var bank = await _bankApplicationService.GetByIdAsync(id);
 
