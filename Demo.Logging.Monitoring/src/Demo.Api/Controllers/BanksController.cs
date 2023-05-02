@@ -1,3 +1,4 @@
+using Demo.Api.CustomEvents;
 using Demo.Application.Contracts;
 using Demo.Application.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -44,14 +45,24 @@ namespace Demo.Api.Controllers
         [ProducesResponseType(204)]
         public async Task<IActionResult> GetAllAsync()
         {
-            var response = await _bankApplicationService.GetAllAsync();
-
-            if(response == null)
+            // using scopes is a way to apply semantic logging.
+            // with this approach we can add key/values (paramters) that can be searched in the logs
+            // which help us to improve the support we deliver to our customers
+            using (_logger.BeginScope("MyLoggingScope: getting banks list"))
             {
-                return NoContent();
-            }
+                _logger.LogDebug("Getting all banks from API");
+                var response = await _bankApplicationService.GetAllAsync();
 
-            return Ok(response);
+                if (response == null)
+                {
+                    _logger.LogWarning("No Banks found.");
+                    return NoContent();
+                }
+
+                _logger.LogInformation(BankEvents.GettingAllBanks, "Getting all banks from API with event id.");
+
+                return Ok(response);
+            }
         }
 
         [HttpGet("{id:guid}")]
@@ -59,10 +70,12 @@ namespace Demo.Api.Controllers
         [ProducesResponseType(204)]
         public async Task<IActionResult> GetByIdAsync(Guid id)
         {
+            _logger.LogInformation("Getting Bank in API based on its ID {id}", id);
             var response = await _bankApplicationService.GetByIdAsync(id);
 
             if (response == null)
             {
+                _logger.LogWarning("No Bank found for ID {id}", id);
                 return NoContent();
             }
 
