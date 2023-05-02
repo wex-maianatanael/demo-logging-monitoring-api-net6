@@ -2,6 +2,7 @@
 using Demo.Infra.Repository.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System.Diagnostics;
 
 namespace Demo.Infra.Repository.Repositories
@@ -26,7 +27,7 @@ namespace Demo.Infra.Repository.Repositories
         {
             _dbContext.Entry(entity).State = EntityState.Added;
             await _dbContext.SaveChangesAsync();
-            
+
             return _dbContext.Entry(entity).Entity;
         }
 
@@ -46,36 +47,37 @@ namespace Demo.Infra.Repository.Repositories
 
         public async Task<TEntity> GetByIdAsync(Guid id)
         {
+            var timer = new Stopwatch();
+            timer.Start();
+
+            var result = await _dbContext.Set<TEntity>().FindAsync(id);
+
+            timer.Stop();
+
+            _logger.LogDebug("Querying {TEntity}s for {id} finished in {milliseconds} milliseconds.", typeof(TEntity).Name, id, timer.ElapsedMilliseconds);
+
+            _factoryLogger.LogInformation("(FactoryLogger) Querying {TEntity}s for {id} finished in {ticks} ticks.", typeof(TEntity).Name, id, timer.ElapsedTicks);
+
+            return result;
+        }
+
+        // this method will never succeed because we're forcing a exception here for test purpose
+        public async Task<bool> UpdateAsync(TEntity entity)
+        {
             try
             {
                 throw new Exception("forced exception.");
 
-                var timer = new Stopwatch();
-                timer.Start();
+                _dbContext.Entry(entity).State = EntityState.Modified;
 
-                var result = await _dbContext.Set<TEntity>().FindAsync(id);
-
-                timer.Stop();
-
-                _logger.LogDebug("Querying {TEntity}s for {id} finished in {milliseconds} milliseconds.", typeof(TEntity).Name, id, timer.ElapsedMilliseconds);
-
-                _factoryLogger.LogInformation("(FactoryLogger) Querying {TEntity}s for {id} finished in {ticks} ticks.", typeof(TEntity).Name, id, timer.ElapsedTicks);
-
-                return result;
+                return await _dbContext.SaveChangesAsync() > 0;
             }
             catch (Exception ex)
             {
                 var newEx = new DbUpdateException("Something bad happened in database.", ex);
-                newEx.Data.Add(typeof(TEntity).Name, id);
+                newEx.Data.Add(typeof(TEntity).Name, JsonConvert.SerializeObject(entity));
                 throw newEx;
             }
-        }
-
-        public async Task<bool> UpdateAsync(TEntity entity)
-        {
-            _dbContext.Entry(entity).State = EntityState.Modified;
-            
-            return await _dbContext.SaveChangesAsync() > 0;
         }
     }
 }

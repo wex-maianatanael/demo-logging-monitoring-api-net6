@@ -38,7 +38,7 @@ namespace Demo.Api.Controllers
                     return NoContent();
                 }
 
-                _logger.LogInformation(BankEvents.GettingAllBanks, "Getting all accounts from API with event id.");
+                _logger.LogInformation(BankEvents.GettingAllDataFromDatabaseTable, "Getting all accounts from API with event id.");
 
                 return Ok(response);
             }

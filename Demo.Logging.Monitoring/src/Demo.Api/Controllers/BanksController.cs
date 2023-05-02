@@ -2,6 +2,7 @@ using Demo.Api.CustomEvents;
 using Demo.Application.Contracts;
 using Demo.Application.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace Demo.Api.Controllers
 {
@@ -30,8 +31,11 @@ namespace Demo.Api.Controllers
 
                 if (createdBank == null)
                 {
+                    _logger.LogWarning("The bank was not created.");
                     return BadRequest();
                 }
+
+                _logger.LogInformation(BankEvents.CreatingNewDataIntoDatabase, "A new bank has been created. {bank}", JsonConvert.SerializeObject(createdBank));
 
                 return Created($"api/banks/{createdBank.ID}", createdBank);
             }
@@ -61,7 +65,7 @@ namespace Demo.Api.Controllers
                     return NoContent();
                 }
 
-                _logger.LogInformation(BankEvents.GettingAllBanks, "Getting all banks from API with event id.");
+                _logger.LogInformation(BankEvents.GettingAllDataFromDatabaseTable, "Getting all banks from API with event id.");
 
                 return Ok(response);
             }

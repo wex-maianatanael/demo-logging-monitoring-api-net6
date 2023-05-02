@@ -5,6 +5,6 @@
     {
         public Guid ID { get; set; }
         public string Name { get; set; }
-        public List<AccountViewModel> Accounts { get; set; }
+        public List<AccountViewModel>? Accounts { get; set; }
     }
 }

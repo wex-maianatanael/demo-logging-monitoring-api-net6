@@ -2,6 +2,7 @@
 {
     public class BankEvents
     {
-        public const int GettingAllBanks = 1000;
+        public const int GettingAllDataFromDatabaseTable = 1000;
+        public const int CreatingNewDataIntoDatabase = 2000;
     }
 }

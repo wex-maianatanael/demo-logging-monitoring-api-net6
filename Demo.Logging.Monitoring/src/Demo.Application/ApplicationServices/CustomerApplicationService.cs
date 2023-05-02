@@ -3,16 +3,20 @@ using Demo.Application.ViewModels;
 using Demo.Domain.Contracts.DomainServices;
 using Demo.Domain.DomainServices;
 using Demo.Domain.Entities;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace Demo.Application.ApplicationServices
 {
     public class CustomerApplicationService : ICustomerApplicationService
     {
         private readonly ICustomerDomainService _customerDomainService;
+        private readonly ILogger<CustomerApplicationService> _logger;
 
-        public CustomerApplicationService(ICustomerDomainService customerDomainService)
+        public CustomerApplicationService(ICustomerDomainService customerDomainService, ILogger<CustomerApplicationService> logger)
         {
             _customerDomainService = customerDomainService;
+            _logger = logger;
         }
 
         public async Task<CustomerViewModel> CreateAsync(CustomerViewModel model)
@@ -34,10 +38,16 @@ namespace Demo.Application.ApplicationServices
         {
             var customers = await _customerDomainService.GetAllAsync();
 
+            if(customers.Any(c => c.Account == null))
+            {
+                _logger.LogWarning("Customers must have a bank account. {customers}", JsonConvert.SerializeObject(customers));
+            }
+
             // todo: use automapper here
             var customersViewModel = new List<CustomerViewModel>();
             foreach (var customer in customers)
             {
+                // todo: should map the account as well
                 var customerViewModel = new CustomerViewModel()
                 {
                     ID = customer.ID,
